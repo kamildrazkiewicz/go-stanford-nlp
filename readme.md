@@ -2,6 +2,8 @@
 
 Go interface for Stanford NLP POS Tagger
 
+More info: http://nlp.stanford.edu/software/tagger.shtml
+
 
 ## Install
 
@@ -24,16 +26,22 @@ and use `pos` as the package name inside the code.
 ```go
 func main() {
 	tagger := pos.NewPOSTagger(
-		"ext/english-left3words-distsim.tagger",
-		"ext/stanford-postagger.jar")
+		"ext/english-left3words-distsim.tagger", // path to model
+		"ext/stanford-postagger.jar")            // path to jar tagger file
 
 	if res, err := tagger.Tag("What is your name?"); err == nil {
-		fmt.Println(res)
+		for _, r := range res {
+			fmt.Println(r.Word, r.TAG)
+		}
 	}
 }
 ```
 
 Output will be:
 ```
-map[is:VBZ your:PRP$ name:NN ?:. What:WP]
+What WP
+is VBZ
+your PRP$
+name NN
+? .
 ```

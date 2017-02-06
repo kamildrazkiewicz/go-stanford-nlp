@@ -12,6 +12,9 @@ func main() {
 		"ext/stanford-postagger.jar")            // path to jar tagger file
 
 	if res, err := tagger.Tag("What is your name?"); err == nil {
-		fmt.Println(res)
+		for _, r := range res {
+			fmt.Println(r.Word, r.TAG)
+		}
 	}
+
 }

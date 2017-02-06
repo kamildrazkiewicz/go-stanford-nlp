@@ -15,6 +15,11 @@ type POSTagger struct {
 	opts   []string
 }
 
+type Result struct {
+	Word string
+	TAG  string
+}
+
 func NewPOSTagger(m, t string) *POSTagger {
 	return &POSTagger{
 		model:  m,
@@ -36,30 +41,39 @@ func (p *POSTagger) SetJavaPath(j string) {
 	p.java = j
 }
 
-func (p *POSTagger) parse(out string) map[string]string {
+func (p *POSTagger) SetJavaOpts(opts []string) {
+	p.opts = opts
+}
+
+func (p *POSTagger) parse(out string) []*Result {
 	words := strings.Split(out, " ")
 
-	res := make(map[string]string, len(words))
-	for _, word := range words {
+	res := make([]*Result, len(words))
+	for i, word := range words {
 		split := strings.Split(word, "_")
-		res[split[0]] = split[1]
+		res[i] = &Result{
+			Word: split[0],
+			TAG:  split[1],
+		}
 	}
 
 	return res
 }
 
-func (p *POSTagger) Tag(input string) (map[string]string, error) {
+func (p *POSTagger) Tag(input string) ([]*Result, error) {
 	var (
-		tmp *os.File
-		err error
+		tmp  *os.File
+		err  error
+		args []string
 	)
 
 	if tmp, err = ioutil.TempFile("", "nlptemp"); err != nil {
 		return nil, err
 	}
+	defer os.Remove(tmp.Name())
 	tmp.WriteString(input)
 
-	args := []string{
+	args = append(p.opts, []string{
 		"-cp",
 		p.tagger + ":",
 		"edu.stanford.nlp.tagger.maxent.MaxentTagger",
@@ -69,7 +83,7 @@ func (p *POSTagger) Tag(input string) (map[string]string, error) {
 		tmp.Name(),
 		"-encoding",
 		"utf8",
-	}
+	}...)
 
 	cmd := exec.Command(p.java, args...)
 
