@@ -31,7 +31,7 @@ func main() {
 
 	if res, err := tagger.Tag("What is your name?"); err == nil {
 		for _, r := range res {
-			fmt.Println(r.Word, r.TAG)
+			fmt.Println(r.Word, r.TAG, r.TAGDescription())
 		}
 	}
 }
@@ -39,9 +39,9 @@ func main() {
 
 Output will be:
 ```
-What WP
-is VBZ
-your PRP$
-name NN
+What WP Wh-pronoun
+is VBZ Verb, 3rd person singular present
+your PRP$ Possessive pronoun
+name NN Noun, singular or mass
 ? .
 ```

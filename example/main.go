@@ -13,7 +13,7 @@ func main() {
 
 	if res, err := tagger.Tag("What is your name?"); err == nil {
 		for _, r := range res {
-			fmt.Println(r.Word, r.TAG)
+			fmt.Println(r.Word, r.TAG, r.TAGDescription())
 		}
 	}
 
