@@ -2,6 +2,8 @@ package pos
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -67,28 +69,45 @@ func (r *Result) TAGDescription() string {
 	return Descriptions[r.TAG]
 }
 
-func NewPOSTagger(m, t string) *POSTagger {
+func NewPOSTagger(m, t string) (*POSTagger, error) {
 	separator := ":"
 	if runtime.GOOS == "windows" {
 		separator = ";"
 	}
 
-	return &POSTagger{
-		model:     m,
-		tagger:    t,
+	pos := &POSTagger{
 		java:      "java",
 		encoding:  "utf8",
 		opts:      []string{"-mx300m"},
 		separator: separator,
 	}
+
+	if err := pos.SetModel(m); err != nil {
+		return nil, err
+	}
+	if err := pos.SetTagger(t); err != nil {
+		return nil, err
+	}
+
+	return pos, nil
 }
 
-func (p *POSTagger) SetModel(m string) {
+func (p *POSTagger) SetModel(m string) error {
+	if _, err := os.Stat(m); err != nil {
+		return errors.New("Model not exists!")
+	}
 	p.model = m
+
+	return nil
 }
 
-func (p *POSTagger) SetTagger(t string) {
+func (p *POSTagger) SetTagger(t string) error {
+	if _, err := os.Stat(t); err != nil {
+		return errors.New("Tagger not exists!")
+	}
 	p.tagger = t
+
+	return nil
 }
 
 func (p *POSTagger) SetJavaPath(j string) {
@@ -153,7 +172,7 @@ func (p *POSTagger) Tag(input string) ([]*Result, error) {
 	cmd.Stderr = &stderr
 
 	if err = cmd.Run(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %s", err, stderr.String())
 	}
 
 	return p.parse(out.String()), nil
