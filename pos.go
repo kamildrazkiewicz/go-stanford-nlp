@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -49,10 +50,11 @@ var Descriptions map[string]string = map[string]string{
 }
 
 type POSTagger struct {
-	model  string
-	tagger string
-	java   string
-	opts   []string
+	model     string
+	tagger    string
+	java      string
+	opts      []string
+	separator string
 }
 
 type Result struct {
@@ -65,11 +67,17 @@ func (r *Result) TAGDescription() string {
 }
 
 func NewPOSTagger(m, t string) *POSTagger {
+	separator := ":"
+	if runtime.GOOS == "windows" {
+		separator = ";"
+	}
+
 	return &POSTagger{
-		model:  m,
-		tagger: t,
-		java:   "java",
-		opts:   []string{"-mx300m"},
+		model:     m,
+		tagger:    t,
+		java:      "java",
+		opts:      []string{"-mx300m"},
+		separator: separator,
 	}
 }
 
@@ -119,7 +127,7 @@ func (p *POSTagger) Tag(input string) ([]*Result, error) {
 
 	args = append(p.opts, []string{
 		"-cp",
-		p.tagger + ":",
+		p.tagger + p.separator,
 		"edu.stanford.nlp.tagger.maxent.MaxentTagger",
 		"-model",
 		p.model,
