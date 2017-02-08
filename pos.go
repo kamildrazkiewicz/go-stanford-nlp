@@ -55,6 +55,7 @@ type POSTagger struct {
 	java      string
 	opts      []string
 	separator string
+	encoding  string
 }
 
 type Result struct {
@@ -76,6 +77,7 @@ func NewPOSTagger(m, t string) *POSTagger {
 		model:     m,
 		tagger:    t,
 		java:      "java",
+		encoding:  "utf8",
 		opts:      []string{"-mx300m"},
 		separator: separator,
 	}
@@ -95,6 +97,10 @@ func (p *POSTagger) SetJavaPath(j string) {
 
 func (p *POSTagger) SetJavaOpts(opts []string) {
 	p.opts = opts
+}
+
+func (p *POSTagger) SetEncoding(e string) {
+	p.encoding = e
 }
 
 func (p *POSTagger) parse(out string) []*Result {
@@ -123,7 +129,9 @@ func (p *POSTagger) Tag(input string) ([]*Result, error) {
 		return nil, err
 	}
 	defer os.Remove(tmp.Name())
-	tmp.WriteString(input)
+	if _, err = tmp.WriteString(input); err != nil {
+		return nil, err
+	}
 
 	args = append(p.opts, []string{
 		"-cp",
@@ -134,7 +142,7 @@ func (p *POSTagger) Tag(input string) ([]*Result, error) {
 		"-textFile",
 		tmp.Name(),
 		"-encoding",
-		"utf8",
+		p.encoding,
 	}...)
 
 	cmd := exec.Command(p.java, args...)
