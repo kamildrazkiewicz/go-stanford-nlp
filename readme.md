@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/kamildrazkiewicz/go-stanford-nlp/blob/master/LICENSE)  [![GoReport](https://goreportcard.com/badge/github.com/kamildrazkiewicz/go-stanford-nlp)](https://goreportcard.com/report/github.com/kamildrazkiewicz/go-stanford-nlp) 
 
-Go interface for Stanford NLP POS Tagger
+Go wrapper for Stanford NLP POS Tagger
 
 More info: http://nlp.stanford.edu/software/tagger.shtml
 
