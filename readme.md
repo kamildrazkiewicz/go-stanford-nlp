@@ -29,8 +29,8 @@ and use `pos` as the package name inside the code.
 func main() {
 	var (
 		tagger *pos.POSTagger
-		err    error
 		res    []*pos.Result
+		err    error
 	)
 
 	if tagger, err = pos.NewPOSTagger(
