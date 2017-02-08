@@ -44,7 +44,7 @@ func main() {
 		return
 	}
 	for _, r := range res {
-		fmt.Println(r.Word, r.TAG, r.TAGDescription())
+		fmt.Println(r.Word, r.TAG, r.Description())
 	}
 
 }

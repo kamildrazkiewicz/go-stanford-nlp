@@ -65,7 +65,10 @@ type Result struct {
 	TAG  string
 }
 
-func (r *Result) TAGDescription() string {
+func (r *Result) Description() string {
+	if _, exists := Descriptions[r.TAG]; !exists {
+		return ""
+	}
 	return Descriptions[r.TAG]
 }
 
