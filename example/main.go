@@ -8,12 +8,12 @@ import (
 
 func main() {
 	var (
-		tagger *pos.POSTagger
+		tagger *pos.Tagger
 		res    []*pos.Result
 		err    error
 	)
 
-	if tagger, err = pos.NewPOSTagger(
+	if tagger, err = pos.NewTagger(
 		"ext/english-left3words-distsim.tagger",    // path to model
 		"ext/stanford-postagger.jar"); err != nil { // path to jar tagger file
 		fmt.Print(err)
