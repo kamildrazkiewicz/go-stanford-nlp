@@ -11,8 +11,9 @@ import (
 	"strings"
 )
 
+// Descriptions - word tags description
 // https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
-var Descriptions map[string]string = map[string]string{
+var Descriptions = map[string]string{
 	"CC":   "Coordinating conjunction",
 	"CD":   "Cardinal number",
 	"DT":   "Determiner",
@@ -51,7 +52,8 @@ var Descriptions map[string]string = map[string]string{
 	"WRB":  "Wh-adverb",
 }
 
-type POSTagger struct {
+// Tagger struct
+type Tagger struct {
 	model     string
 	tagger    string
 	java      string
@@ -60,11 +62,13 @@ type POSTagger struct {
 	encoding  string
 }
 
+// Result struct
 type Result struct {
 	Word string
 	TAG  string
 }
 
+// Description - returns tag description
 func (r *Result) Description() string {
 	if _, exists := Descriptions[r.TAG]; !exists {
 		return ""
@@ -72,13 +76,14 @@ func (r *Result) Description() string {
 	return Descriptions[r.TAG]
 }
 
-func NewPOSTagger(m, t string) (*POSTagger, error) {
+// NewTagger - returns Tagger pointer
+func NewTagger(m, t string) (*Tagger, error) {
 	separator := ":"
 	if runtime.GOOS == "windows" {
 		separator = ";"
 	}
 
-	pos := &POSTagger{
+	pos := &Tagger{
 		java:      "java",
 		encoding:  "utf8",
 		opts:      []string{"-mx300m"},
@@ -95,7 +100,8 @@ func NewPOSTagger(m, t string) (*POSTagger, error) {
 	return pos, nil
 }
 
-func (p *POSTagger) SetModel(m string) error {
+// SetModel - set stanford pos tagger model
+func (p *Tagger) SetModel(m string) error {
 	if _, err := os.Stat(m); err != nil {
 		return errors.New("Model not exists!")
 	}
@@ -104,7 +110,8 @@ func (p *POSTagger) SetModel(m string) error {
 	return nil
 }
 
-func (p *POSTagger) SetTagger(t string) error {
+// SetTagger - set stanford pos tagger jar file
+func (p *Tagger) SetTagger(t string) error {
 	if _, err := os.Stat(t); err != nil {
 		return errors.New("Tagger not exists!")
 	}
@@ -113,19 +120,22 @@ func (p *POSTagger) SetTagger(t string) error {
 	return nil
 }
 
-func (p *POSTagger) SetJavaPath(j string) {
+// SetJavaPath - set path to java executable file
+func (p *Tagger) SetJavaPath(j string) {
 	p.java = j
 }
 
-func (p *POSTagger) SetJavaOpts(opts []string) {
+// SetJavaOpts - set java options (default: [mx300m])
+func (p *Tagger) SetJavaOpts(opts []string) {
 	p.opts = opts
 }
 
-func (p *POSTagger) SetEncoding(e string) {
+// SetEncoding - set outupt encoding (default: utf8)
+func (p *Tagger) SetEncoding(e string) {
 	p.encoding = e
 }
 
-func (p *POSTagger) parse(out string) []*Result {
+func (p *Tagger) parse(out string) []*Result {
 	words := strings.Split(out, " ")
 
 	res := make([]*Result, len(words))
@@ -140,7 +150,8 @@ func (p *POSTagger) parse(out string) []*Result {
 	return res
 }
 
-func (p *POSTagger) Tag(input string) ([]*Result, error) {
+// Tag - use stanford pos tagger to tag input sentence
+func (p *Tagger) Tag(input string) ([]*Result, error) {
 	var (
 		tmp  *os.File
 		err  error
